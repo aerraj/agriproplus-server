@@ -1,16 +1,10 @@
-// routes/schemeRouter.js
-import express from 'express';
-import { getAllSchemes, getSchemeById, createScheme } from '../controllers/schemeController.js';
+import express from "express";
+import { createScheme, getAllSchemes, getSchemeById } from "../controllers/schemeController.js";
+import adminGuard from "../middleware/adminGuard.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
 const router = express.Router();
-
-// Get all schemes
-router.get('/', getAllSchemes);
-
-// // Get a specific scheme
-// router.get('/:id', getSchemeById);
-
-// Create a new scheme
-router.post('/', createScheme);
-
+router.get("/", asyncHandler(getAllSchemes));
+router.get("/:id", asyncHandler(getSchemeById));
+router.post("/", adminGuard, asyncHandler(createScheme));
 export default router;

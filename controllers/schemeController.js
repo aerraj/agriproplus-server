@@ -1,42 +1,36 @@
-// controllers/schemeController.js
-import Scheme from '../models/scheme.js';
+import { dbConnection } from "../database/dbConnection.js";
+import Scheme from "../models/scheme.js";
 
-// Get all schemes
-export const getAllSchemes = async (req, res) => {
-    try {
-        const schemes = await Scheme.find();
-        res.json(schemes);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+export async function getAllSchemes(req, res) {
+  await dbConnection();
+  if (!process.env.MONGO_URI) {
+    return res.json({ items: [], total: 0, source: "unconfigured" });
+  }
 
-// Get a specific scheme
-export const getSchemeById = async (req, res) => {
-    try {
-        const scheme = await Scheme.findById(req.params.id);
-        if (scheme == null) {
-            return res.status(404).json({ message: 'Cannot find scheme' });
-        }
-        res.json(scheme);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+  const limit = Math.min(Math.max(Number(req.query.limit) || 24, 1), 100);
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const filter = {};
+  if (req.query.search) filter.$text = { $search: String(req.query.search).slice(0, 120) };
+  if (req.query.tag) filter.tags = String(req.query.tag);
+  if (req.query.state) filter.states = { $in: ["All India", String(req.query.state)] };
 
-// Create a new scheme
-export const createScheme = async (req, res) => {
-    const scheme = new Scheme({
-        title: req.body.title,
-        description: req.body.description,
-        ministry: req.body.ministry,
-        tags: req.body.tags
-    });
+  const [items, total] = await Promise.all([
+    Scheme.find(filter).sort({ featured: -1, updatedAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
+    Scheme.countDocuments(filter),
+  ]);
+  return res.json({ items, total, page, pages: Math.max(1, Math.ceil(total / limit)) });
+}
 
-    try {
-        const newScheme = await scheme.save();
-        res.status(201).json(newScheme);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-};
+export async function getSchemeById(req, res) {
+  await dbConnection();
+  if (!process.env.MONGO_URI) return res.status(503).json({ message: "Scheme storage is not configured." });
+  const scheme = await Scheme.findById(req.params.id).lean();
+  if (!scheme) return res.status(404).json({ message: "Scheme not found." });
+  return res.json(scheme);
+}
+
+export async function createScheme(req, res) {
+  await dbConnection();
+  const scheme = await Scheme.create(req.body);
+  return res.status(201).json(scheme);
+}

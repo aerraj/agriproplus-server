@@ -1,7 +1,7 @@
 import express from "express";
-import { sendMessage } from "../controllers/messageController.js";
+import { recommendCrop } from "../controllers/cropController.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 
 const router = express.Router();
-router.post("/send", asyncHandler(sendMessage));
+router.post("/recommend", asyncHandler(recommendCrop));
 export default router;

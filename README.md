@@ -1,28 +1,28 @@
-# Agripro Backend
+# AgriPro+ Platform API
 
-Welcome to the Agripro Backend repository! This repository contains the server-side code for the Agripro+ application.
+The Node/Express API for schemes, support requests, and the crop-intelligence
+gateway. Version 2 is designed for serverless reuse: database connections are
+cached, payload sizes are bounded, writes are protected, and external AI calls
+have explicit timeouts.
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
+## Run locally
 
-## Introduction
-The Agripro Backend is built using [Node.js](https://nodejs.org/) and [Express](https://expressjs.com/), providing a robust and scalable backend infrastructure for the Agripro+ application. It handles various functionalities such as data storage, authentication, and API endpoints.
+```bash
+cp .env.example .env
+npm install
+npm run dev
+```
 
-## Features
-- Database integration for storing agricultural schemes
-- RESTful API endpoints for seamless communication with the frontend
+The API is available at `http://localhost:4000`; readiness is reported by
+`GET /api/health`.
 
+## Routes
 
-## Installation
-To get started with the Agripro Backend, follow these steps:
+- `POST /api/crops/recommend` — validated model gateway
+- `GET /api/schemes` — searchable, paginated schemes
+- `GET /api/schemes/:id` — one scheme
+- `POST /api/schemes` — administrator-only scheme creation
+- `POST /api/message/send` — validated support request
 
-1. Clone this repository to your local machine.
-2. Install the required dependencies by running `npm install`.
-3. Set up the necessary environment variables. Refer to the `.env.example` file for the required variables.
-4. Run the server using `npm start`.
-
-## Usage
-Once the server is up and running, you can start making API requests to interact with the Agripro+ application
+See `.env.example` for deployment configuration. Never commit the real MongoDB
+URI or administrator key.
