@@ -38,3 +38,16 @@ test("contact form rejects incomplete data", async () => {
   });
   assert.equal(response.status, 422);
 });
+
+test("crop intelligence recommends rice for a representative field", async () => {
+  const response = await fetch(`${baseUrl}/api/crops/recommend`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ N: 90, P: 42, K: 43, temperature: 20.9, humidity: 82, pH: 6.5, rainfall: 202.9 }),
+  });
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.recommended_crop, "rice");
+  assert.ok(payload.confidence > 0.9);
+  assert.equal(payload.model_version, "agripro-rf-2026.1");
+});

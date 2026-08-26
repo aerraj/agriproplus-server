@@ -1,9 +1,9 @@
 # AgriPro+ Platform API
 
-The Node/Express API for schemes, support requests, and the crop-intelligence
-gateway. Version 2 is designed for serverless reuse: database connections are
-cached, payload sizes are bounded, writes are protected, and external AI calls
-have explicit timeouts.
+The Node/Express API for schemes, support requests, and crop intelligence.
+Version 2 is designed for serverless reuse: database connections are cached,
+payload sizes are bounded, writes are protected, and the exported 96-tree model
+runs in-process without a fragile external ML runtime.
 
 ## Run locally
 
@@ -18,7 +18,7 @@ The API is available at `http://localhost:4000`; readiness is reported by
 
 ## Routes
 
-- `POST /api/crops/recommend` — validated model gateway
+- `POST /api/crops/recommend` — validated, in-process model inference
 - `GET /api/schemes` — searchable, paginated schemes
 - `GET /api/schemes/:id` — one scheme
 - `POST /api/schemes` — administrator-only scheme creation
