@@ -42,6 +42,22 @@ function rankedPredictions(values) {
     .slice(0, 3);
 }
 
+export function getCropApiInfo(_req, res) {
+  return res.json({
+    service: "AgriPro+ Crop Intelligence API",
+    status: "ready",
+    model_version: MODEL.version,
+    accuracy: MODEL.validation.accuracy,
+    crops: MODEL.labels.length,
+    trees: MODEL.trees.length,
+    predict: {
+      method: "POST",
+      endpoint: "/api/crops/recommend",
+      fields: Object.fromEntries(FEATURES.map((feature) => [feature, { minimum: RANGES[feature][0], maximum: RANGES[feature][1] }])),
+    },
+  });
+}
+
 export async function recommendCrop(req, res) {
   const started = performance.now();
   const { values, fields } = parseConditions(req.body);

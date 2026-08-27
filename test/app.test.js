@@ -51,3 +51,12 @@ test("crop intelligence recommends rice for a representative field", async () =>
   assert.ok(payload.confidence > 0.9);
   assert.equal(payload.model_version, "agripro-rf-2026.1");
 });
+
+test("crop API documents its public contract", async () => {
+  const response = await fetch(`${baseUrl}/api/crops`);
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.status, "ready");
+  assert.equal(payload.crops, 22);
+  assert.equal(payload.predict.method, "POST");
+});
